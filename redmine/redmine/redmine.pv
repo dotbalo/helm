@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redmine-data
+spec:
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: "redmine-data"
+  nfs:
+    # real share directory
+    path: /k8s/redmine
+    # nfs real ip
+    server: 192.168.2.2
+

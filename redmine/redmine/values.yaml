@@ -47,11 +47,11 @@ redmineLanguage: en
 ## SMTP mail delivery configuration
 ## ref: https://github.com/bitnami/bitnami-docker-redmine/#smtp-configuration
 ##
-smtpHost: smtp.exmail.qq.com
-smtpPort: 465
-smtpUser: dukuan@haixiangjinfu.com
-smtpPassword: DKhxlc2018,./!@#
-smtpTls: true
+smtpHost: smtp.xxx.com
+smtpPort: 25
+smtpUser: dukuan@xxx.com
+smtpPassword: DKxxx
+smtpTls: false
 
 ## Environment variables, to pass to the entry point
 ##

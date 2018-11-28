@@ -87,7 +87,7 @@ database:
     password: "changeit"
     volumes:
       data:
-        storageClass: "gluster-heketi"
+        # storageClass: "-"
         accessMode: ReadWriteOnce
         size: 1Gi
     # resources:
@@ -180,9 +180,9 @@ registry:
   volumes:
     data:
       # existingClaim: ""
-      storageClass: "gluster-heketi"
+      # storageClass: "-"
       accessMode: ReadWriteOnce
-      size: 10Gi
+      size: 5Gi
   # resources:
   #  requests:
   #    memory: 256Mi
@@ -200,7 +200,7 @@ chartmuseum:
   volumes:
     data:
       # existingClaim: ""
-      storageClass: "gluster-heketi"
+      # storageClass: "-"
       accessMode: ReadWriteOnce
       size: 5Gi
   # resources:
@@ -237,15 +237,13 @@ redis:
   cluster:
     enabled: false
   master:
-    port: 6379
     persistence:
       enabled: *persistence_enabled
-      storageClass: "gluster-heketi"
+      # storageClass: "-"
       accessMode: ReadWriteOnce
       size: 1Gi
   persistence:
     # existingClaim:
-    storageClass: "gluster-heketi"
   external:
     enabled: false
     host: "192.168.0.2"

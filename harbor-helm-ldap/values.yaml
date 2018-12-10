@@ -180,9 +180,9 @@ registry:
   volumes:
     data:
       # existingClaim: ""
-      storageClass: "gluster-heketi"
+      storageClass: "gluster-heketi-2"
       accessMode: ReadWriteOnce
-      size: 10Gi
+      size: 30Gi
   # resources:
   #  requests:
   #    memory: 256Mi

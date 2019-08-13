@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## v0.7.0 (2019-07-22)
+
+## v0.7.0-rc1 (2019-07-09)
 - Fix broken anchor link for gcs cache docs !135
 - Allow user to set rbac roles !112
-- Bump used Runner version to 12.1.0 !149
+- Bump used Runner version to 12.1.0-rc1 !144
 
 ## v0.6.0 (2019-06-24)
 - Allow to manually build the package for development branches !120

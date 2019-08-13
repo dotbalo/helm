@@ -42,6 +42,13 @@ data:
       exit 1
     fi
 
+    # Temporary workaround until https://gitlab.com/gitlab-org/gitlab-runner/issues/4228
+    # is merged
+    sed -n '30,$p' /home/gitlab-runner/.gitlab-runner/config.toml >> /home/gitlab-runner/custom_commands
+    sed -e '30,$d' -i /home/gitlab-runner/.gitlab-runner/config.toml
+    cat /scripts/kubernetes.volumes | sed -e '1d' | sed '1,$s/^/      /' >> /home/gitlab-runner/.gitlab-runner/config.toml
+    cat /home/gitlab-runner/custom_commands >> /home/gitlab-runner/.gitlab-runner/config.toml
+
     # Start the runner
     /entrypoint run --user=gitlab-runner \
       --working-directory=/home/gitlab-runner
@@ -53,6 +60,8 @@ data:
     {{- if .Values.metrics.enabled }}
     listen_address = '[::]:9252'
     {{- end }}
+  kubernetes.volumes: |
+    {{ template "gitlab-runner.runners.kubernetes.volumes" . }}
   configure: |
     set -e
     cp /init-secrets/* /secrets

@@ -5,7 +5,7 @@
 ##
 ## ref: https://hub.docker.com/r/gitlab/gitlab-runner/tags/
 ##
-# image: gitlab/gitlab-runner:alpine-v11.6.0
+image: gitlab/gitlab-runner:alpine-v11.6.0
 
 ## Specify a imagePullPolicy
 ## 'Always' if imageTag is 'latest', else set to 'IfNotPresent'
@@ -16,13 +16,13 @@ imagePullPolicy: IfNotPresent
 ## The GitLab Server URL (with protocol) that want to register the runner against
 ## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-register
 ##
-# gitlabUrl: http://gitlab.your-domain.com/
+gitlabUrl: http://g.xxx.com.cn/ci/ 
 
 ## The Registration Token for adding new Runners to the GitLab Server. This must
 ## be retrieved from your GitLab Instance.
 ## ref: https://docs.gitlab.com/ce/ci/runners/README.html
 ##
-# runnerRegistrationToken: ""
+runnerRegistrationToken: "jdCJLgHMxLnzHtXJ"
 
 ## The Runner Token for adding new Runners to the GitLab Server. This must
 ## be retrieved from your GitLab Instance. It is token of already registered runner.
@@ -74,7 +74,7 @@ rbac:
 
   ## Use the following Kubernetes Service Account name if RBAC is disabled in this Helm chart (see rbac.create)
   ##
-  # serviceAccountName: default
+  serviceAccountName: gitlab
 
 ## Configure integrated Prometheus metrics exporter
 ## ref: https://docs.gitlab.com/runner/monitoring/#configuration-of-the-metrics-http-server
@@ -111,14 +111,14 @@ runners:
   ##
   ## ref: https://docs.gitlab.com/ce/ci/runners/#using-tags
   ##
-  # tags: ""
+  tags: "kubernetes-runner"
 
   ## Run all containers with the privileged flag enabled
   ## This will allow the docker:dind image to run if you need to run Docker
   ## commands. Please read the docs before turning this on:
   ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#using-docker-dind
   ##
-  privileged: false
+  privileged: true
 
   ## The name of the secret containing runner-token and runner-registration-token
   # secret: gitlab-runner
@@ -126,6 +126,20 @@ runners:
   ## Namespace to run Kubernetes jobs in (defaults to the same namespace of this release)
   ##
   # namespace:
+
+  ## Kubernetes Volumes
+  ## Define volumes to be mounted to service containers
+  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#using-volumes
+  ##
+  kubernetes:
+    volumes:
+    - type: pvc
+      volume:
+        name: gitrunner-workspace
+        mount_path: "/builds/"
+        read_only: false
+      #items:
+        #key: relative/filepath
 
   ## Distributed runners caching
   ## ref: https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/autoscale.md#distributed-runners-caching
@@ -241,13 +255,13 @@ runners:
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: {}
-  # limits:
-  #   memory: 256Mi
-  #   cpu: 200m
-  # requests:
-  #   memory: 128Mi
-  #   cpu: 100m
+resources: 
+   limits:
+     memory: 256Mi
+     cpu: 200m
+   requests:
+     memory: 128Mi
+     cpu: 10m
 
 ## Affinity for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity

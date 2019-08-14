@@ -22,7 +22,7 @@ gitlabUrl: http://g.xxx.com.cn/ci/
 ## be retrieved from your GitLab Instance.
 ## ref: https://docs.gitlab.com/ce/ci/runners/README.html
 ##
-runnerRegistrationToken: "jdCJLgHMxLnzHtXJ"
+runnerRegistrationToken: "jdCzafpLHxnHtXJ"
 
 ## The Runner Token for adding new Runners to the GitLab Server. This must
 ## be retrieved from your GitLab Instance. It is token of already registered runner.
@@ -54,7 +54,7 @@ concurrent: 10
 ## Defines in seconds how often to check GitLab for a new builds
 ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
 ##
-checkInterval: 30
+checkInterval: 0
 
 ## Configure GitLab Runner's logging level. Available values are: debug, info, warn, error, fatal, panic
 ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
@@ -136,10 +136,15 @@ runners:
     - type: pvc
       volume:
         name: gitrunner-workspace
-        mount_path: "/builds/"
+        mount_path: "/cache/"
         read_only: false
       #items:
         #key: relative/filepath
+    - type: secret
+      volume:
+        name: limit-ns-kubeconfig
+        mount_path: "/mnt"
+        read_only: true
 
   ## Distributed runners caching
   ## ref: https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/autoscale.md#distributed-runners-caching
@@ -196,11 +201,11 @@ runners:
 
   ## Build Container specific configuration
   ##
-  builds: {}
-    # cpuLimit: 200m
-    # memoryLimit: 256Mi
-    # cpuRequests: 100m
-    # memoryRequests: 128Mi
+  builds: 
+    cpuLimit: 3000m
+    memoryLimit: 2048Mi
+    cpuRequests: 100m
+    memoryRequests: 256Mi
 
   ## Service Container specific configuration
   ##

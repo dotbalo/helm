@@ -5,7 +5,7 @@
 ##
 ## ref: https://hub.docker.com/r/gitlab/gitlab-runner/tags/
 ##
-image: gitlab/gitlab-runner:alpine-v11.6.0
+#image: gitlab/gitlab-runner:alpine-v11.6.0
 
 ## Specify a imagePullPolicy
 ## 'Always' if imageTag is 'latest', else set to 'IfNotPresent'
@@ -16,13 +16,13 @@ imagePullPolicy: IfNotPresent
 ## The GitLab Server URL (with protocol) that want to register the runner against
 ## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-register
 ##
-gitlabUrl: http://g.xxx.com.cn/ci/ 
+gitlabUrl: http://g.com.cn/ci/ 
 
 ## The Registration Token for adding new Runners to the GitLab Server. This must
 ## be retrieved from your GitLab Instance.
 ## ref: https://docs.gitlab.com/ce/ci/runners/README.html
 ##
-runnerRegistrationToken: "g_xn1xxFx2TtxpSkMy5C3q"
+runnerRegistrationToken: ""
 
 ## The Runner Token for adding new Runners to the GitLab Server. This must
 ## be retrieved from your GitLab Instance. It is token of already registered runner.
@@ -87,6 +87,12 @@ runners:
   ## Default container image to use for builds when none is specified
   ##
   image: ubuntu:16.04
+  envVars:
+  - name: KUBERNETES_NODE_SELECTOR
+    value: "env:pre-prod"
+  - name: KUBERNETES_NODE_TOLERATIONS
+    value: "pre-prod:NoSchedule"
+
 
   ## Specify one or more imagePullSecrets
   ##
@@ -240,7 +246,8 @@ runners:
   ## Specify node labels for CI job pods assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
-  # nodeSelector: {}
+  nodeSelector: 
+    env: "pre-prod"
 
   ## Specify pod labels for CI job pods
   ##
@@ -258,8 +265,14 @@ runners:
   ##
   ## ref: https://docs.gitlab.com/runner/commands/#gitlab-runner-register
   ##
-  # env:
-  #   NAME: VALUE
+  env:
+    KUBERNETES_NODE_TOLERATIONS: "node-role.kubernetes.io/master=:NoSchedule"
+
+  envVars:
+    - name: KUBERNETES_NODE_SELECTOR
+      value: "env:pre-prod"
+    - name: KUBERNETES_NODE_TOLERATIONS
+      value: "node-role.kubernetes.io/master=:NoSchedule"
 
 
 ## Configure resource requests and limits
@@ -281,19 +294,20 @@ affinity: {}
 ## Node labels for pod assignment
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
-nodeSelector: {}
+nodeSelector:
   # Example: The gitlab runner manager should not run on spot instances so you can assign
   # them to the regular worker nodes only.
-  # node-role.kubernetes.io/worker: "true"
+  env: "pre-prod"
 
 ## List of node taints to tolerate (requires Kubernetes >= 1.6)
 ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: []
+tolerations:
   # Example: Regular worker nodes may have a taint, thus you need to tolerate the taint
   # when you assign the gitlab runner manager with nodeSelector or affinity to the nodes.
-  # - key: "node-role.kubernetes.io/worker"
-  #   operator: "Exists"
+  - key: "node-role.kubernetes.io/master"
+    operator: "Exists"
+    effect: "NoSchedule"
 
 ## Configure environment variables that will be present when the registration command runs
 ## This provides further control over the registration process and the config.toml file
@@ -303,6 +317,11 @@ tolerations: []
 # envVars:
 #   - name: RUNNER_EXECUTOR
 #     value: kubernetes
+envVars:
+  - name: KUBERNETES_NODE_SELECTOR
+    value: "env:pre-prod"
+  - name: KUBERNETES_NODE_TOLERATIONS
+    value: "node-role.kubernetes.io/master=:NoSchedule"
 
 ## list of hosts and IPs that will be injected into the pod's hosts file
 hostAliases: []

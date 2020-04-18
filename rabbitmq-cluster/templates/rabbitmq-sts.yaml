@@ -1,0 +1,131 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  {{- if .Values.labels }}
+  labels:
+    {{- with .Values.labels }}
+       {{- toYaml . | nindent 4 -}}
+    {{- end }}
+  {{- else }}
+  labels: {{ include "rabbitmq-cluster.labels" . | nindent 4 }}
+  {{- end }}
+  name: {{ .Chart.Name }} 
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- with .Values.labels }}
+         {{- toYaml . | nindent 6 -}}
+      {{- end }}
+  serviceName: {{ .Values.service.headless.name }}
+  template:
+    metadata:
+      labels:
+        {{- with .Values.labels }}
+            {{- toYaml . | nindent 8 -}}
+        {{- end }}
+    spec:
+      containers:
+      - args:
+        - -c
+        - cp -v /etc/rabbitmq/rabbitmq.conf ${RABBITMQ_CONFIG_FILE}; exec docker-entrypoint.sh
+          rabbitmq-server
+        command:
+        - sh
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: {{ .Values.secret.name }}
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: {{ .Values.secret.name }}
+        - name: RABBITMQ_ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              key: cookie
+              name: {{ .Values.secret.name }}
+        - name: K8S_SERVICE_NAME
+          value: {{ .Values.service.headless.name }}
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: RABBITMQ_USE_LONGNAME
+          value: "true"
+        - name: RABBITMQ_NODENAME
+          value: rabbit@$(POD_NAME).{{- .Values.service.headless.name -}}.$(POD_NAMESPACE).svc.cluster.local
+        - name: RABBITMQ_CONFIG_FILE
+          value: /var/lib/rabbitmq/rabbitmq.conf
+        image: {{ .Values.image.repository }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        livenessProbe:
+          exec:
+            command:
+            - rabbitmqctl
+            - status
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        name: rabbitmq
+        ports:
+        - containerPort: 15672
+          name: http
+          protocol: TCP
+        - containerPort: 5672
+          name: amqp
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - rabbitmqctl
+            - status
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        volumeMounts:
+        - mountPath: /etc/rabbitmq
+          name: config-volume
+          readOnly: false
+        - mountPath: /var/lib/rabbitmq
+          name: rabbitmq-storage
+          readOnly: false
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          items:
+          - key: rabbitmq.conf
+            path: rabbitmq.conf
+          - key: enabled_plugins
+            path: enabled_plugins
+          name: {{ .Values.configmap.name }} 
+        name: config-volume
+        #- name: rabbitmq-storage
+        #emptyDir: {}
+{{- if .Values.storage.storageClass.use }}
+  volumeClaimTemplates:
+  - metadata:
+      name: rabbitmq-storage
+    spec:
+      accessModes:
+      {{- with .Values.storage.storageClass.accessModes }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      storageClassName: {{ .Values.storage.storageClass.name }}
+      resources:
+        requests:
+          storage: {{ .Values.storage.storageClass.storage }}
+{{- else }}
+      - name: rabbitmq-storage
+        emptyDir: {}
+{{- end }}

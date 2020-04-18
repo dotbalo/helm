@@ -1,0 +1,41 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    {{- with .Values.labels }}
+       {{- toYaml . | nindent 4 -}}
+    {{- end }} 
+  name: {{ .Values.service.headless.name }} 
+spec:
+  clusterIP: None
+  ports:
+  - name: amqp
+    port: 5672
+    targetPort: 5672
+  selector:
+    {{- with .Values.labels }}
+       {{- toYaml . | nindent 4 -}}
+    {{- end }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: rmq-cluster
+    type: LoadBalancer
+  name: {{ .Values.service.loadbalancer.name }} 
+spec:
+  ports:
+  - name: http
+    port: 15672
+    protocol: TCP
+    targetPort: 15672
+  - name: amqp
+    port: 5672
+    protocol: TCP
+    targetPort: 5672
+  selector:
+    {{- with .Values.labels }}
+       {{- toYaml . | nindent 4 -}}
+    {{- end }}
+  type: {{ .Values.service.loadbalancer.type }} # ClusterIP ingress

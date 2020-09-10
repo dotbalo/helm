@@ -24,7 +24,7 @@ configmap:
 secret:
   name: rabbitmq-secret          
 username: rabbitmq
-password: 1'mRabbitMQ
+password: password
 
 # 部署至不同宿主机
 deploy2DiffNodes: true

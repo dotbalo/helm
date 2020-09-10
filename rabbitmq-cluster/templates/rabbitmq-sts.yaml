@@ -115,6 +115,10 @@ spec:
           readOnly: false
       serviceAccountName: {{ .Values.serviceAccount.name }}
       terminationGracePeriodSeconds: 30
+      nodeSelector:
+      {{- with .Values.nodeSelector }}
+         {{- toYaml . | nindent 8 -}}
+      {{- end }}
       volumes:
       - configMap:
           items:
@@ -139,6 +143,11 @@ spec:
       resources:
         requests:
           storage: {{ .Values.storage.storageClass.storage }}
+{{- else if .Values.storage.hostPath.use }}
+      - name: rabbitmq-storage
+        hostPath:
+          path: {{ .Values.storage.hostPath.path }}
+          type: {{ .Values.storage.hostPath.type }}
 {{- else }}
       - name: rabbitmq-storage
         emptyDir: {}

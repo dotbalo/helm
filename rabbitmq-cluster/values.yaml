@@ -26,6 +26,12 @@ secret:
 username: RABBITMQ_USER
 password: RABBITMQ_PASS
 
+# 部署至不同宿主机
+deploy2DiffNodes: true
+
+# nodeSelector
+nodeSelector:
+  #rabbitmq: true
 
 # storage
 storage:
@@ -36,6 +42,12 @@ storage:
     storage: 1Gi
     accessModes:
       - ReadWriteOnce
+  # mount host path to Container
+  hostPath:
+    use: false
+    path: /data/rabbitmq
+    type: DirectoryOrCreate # Directory or FileOrCreate or ...
+    
 
 imagePullSecrets: []
 nameOverride: ""
@@ -50,5 +62,3 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: rabbitmq-cluster
 
-# 部署至不同宿主机
-deploy2DiffNodes: true

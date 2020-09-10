@@ -31,7 +31,7 @@ deploy2DiffNodes: true
 
 # nodeSelector
 nodeSelector:
-  daas-rabbitmq: "true"
+  rabbitmq: "true"
 
 resources:
   config: true

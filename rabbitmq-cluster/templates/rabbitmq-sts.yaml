@@ -106,6 +106,15 @@ spec:
             - status
           initialDelaySeconds: 10
           timeoutSeconds: 10
+        {{- if .Values.resources.config }}
+        resources:
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"
+        {{- end }}
         volumeMounts:
         - mountPath: /etc/rabbitmq
           name: config-volume
@@ -128,8 +137,6 @@ spec:
             path: enabled_plugins
           name: {{ .Values.configmap.name }} 
         name: config-volume
-        #- name: rabbitmq-storage
-        #emptyDir: {}
 {{- if .Values.storage.storageClass.use }}
   volumeClaimTemplates:
   - metadata:

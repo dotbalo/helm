@@ -6,32 +6,41 @@ labels:
   app: rabbitmq-cluster
   helm: "true"
 
-replicaCount: 2
+replicaCount: 3
 
 service:
   headless: 
     name: rabbitmq-cluster-svc
   loadbalancer:
     name: rabbitmq-cluster-loadbalancer
-    type: NodePort
+    type: ClusterIP
 
 image:
-  repository: "rabbitmq:3.8.3-management"
+  repository: "rabbitmq:3.8.8-management"
   pullPolicy: IfNotPresent
 
 configmap:
   name: rabbitmq-configmap
 secret:
   name: rabbitmq-secret          
-username: RABBITMQ_USER
-password: RABBITMQ_PASS
+username: rabbitmq
+password: 1'mRabbitMQ
 
 # 部署至不同宿主机
 deploy2DiffNodes: true
 
 # nodeSelector
 nodeSelector:
-  #rabbitmq: true
+  daas-rabbitmq: "true"
+
+resources:
+  config: true
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
 
 # storage
 storage:

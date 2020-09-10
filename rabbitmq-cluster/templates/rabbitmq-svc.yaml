@@ -12,6 +12,7 @@ spec:
   - name: amqp
     port: 5672
     targetPort: 5672
+  publishNotReadyAddresses: true
   selector:
     {{- with .Values.labels }}
        {{- toYaml . | nindent 4 -}}

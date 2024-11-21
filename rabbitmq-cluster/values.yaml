@@ -16,7 +16,7 @@ service:
     type: ClusterIP
 
 image:
-  repository: "rabbitmq:3.8.8-management"
+  repository: "registry.cn-beijing.aliyuncs.com/dotbalo/rabbitmq:3.13.6-management-alpine"
   pullPolicy: IfNotPresent
 
 configmap:
